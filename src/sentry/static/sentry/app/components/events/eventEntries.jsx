@@ -33,6 +33,7 @@ import SentryTypes from 'app/sentryTypes';
 import StacktraceInterface from 'app/components/events/interfaces/stacktrace';
 import TemplateInterface from 'app/components/events/interfaces/template';
 import ThreadsInterface from 'app/components/events/interfaces/threads';
+import SpansInterface from 'app/components/events/interfaces/spans';
 import withApi from 'app/utils/withApi';
 import withOrganization from 'app/utils/withOrganization';
 
@@ -49,6 +50,7 @@ export const INTERFACES = {
   breadcrumbs: BreadcrumbsInterface,
   threads: ThreadsInterface,
   debugmeta: DebugMetaInterface,
+  spans: SpansInterface,
 };
 
 class EventEntries extends React.Component {
