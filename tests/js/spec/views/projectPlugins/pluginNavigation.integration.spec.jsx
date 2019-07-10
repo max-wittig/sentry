@@ -1,6 +1,6 @@
 import React from 'react';
 import {mount} from 'enzyme';
-import ProjectPlugins from 'app/views/projectPlugins';
+import ProjectPlugins from 'app/views/settings/projectPlugins';
 import PluginNavigation from 'app/views/projectSettings/pluginNavigation';
 
 jest.mock('app/api');
