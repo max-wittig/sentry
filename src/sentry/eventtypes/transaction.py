@@ -13,7 +13,9 @@ class TransactionEvent(BaseEvent):
         transaction = get_path(data, 'transaction')
         return {
             'title': description or transaction,
-            'location': transaction
+            'location': transaction,
+            'startTimestamp': data.get('start_timestamp'),
+            'timestamp': data.get('timestamp'),
         }
 
     def get_title(self, metadata):

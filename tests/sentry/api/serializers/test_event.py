@@ -189,10 +189,11 @@ class EventSerializerTest(TestCase):
             project_id=self.project.id
         )
         result = serialize(event)
-        assert result['timestamp'] == event.data.get('timestamp')
-        assert isinstance(result['timestamp'], float)
-        assert result['startTimestamp'] == event.data.get('start_timestamp')
-        assert isinstance(result['startTimestamp'], float)
+        assert isinstance(result['metadata']['timestamp'], float)
+        assert result['metadata']['timestamp'] == event.data.get('timestamp')
+
+        assert isinstance(result['metadata']['startTimestamp'], float)
+        assert result['metadata']['startTimestamp'] == event.data.get('start_timestamp')
 
 
 class SharedEventSerializerTest(TestCase):
