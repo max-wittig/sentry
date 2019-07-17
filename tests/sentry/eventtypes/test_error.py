@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from sentry.eventtypes import ErrorEvent
-from sentry.testutils import TestCase
+from unittest import TestCase
 
 
 class ErrorEventTest(TestCase):
@@ -42,3 +42,15 @@ class ErrorEventTest(TestCase):
         inst = ErrorEvent()
         result = inst.get_title({'type': 'Error', 'value': ''})
         assert result == 'Error'
+
+    def test_build_search_message(self):
+        inst = ErrorEvent()
+        data = {
+            'type': 'Exception',
+            'value': 'Foo',
+        }
+        result = inst.build_search_message('', data)
+        assert 'Exception' in result
+        assert 'Foo' in result
+        assert 'type' not in result
+        assert 'value' not in result

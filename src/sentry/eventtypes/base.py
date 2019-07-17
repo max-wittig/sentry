@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
+import six
 from warnings import warn
+from django.utils.encoding import force_text
 
 from sentry.utils.strings import truncatechars, strip
 from sentry.utils.safe import get_path
@@ -20,6 +22,13 @@ class BaseEvent(object):
 
     def get_location(self, metadata):
         return None
+
+    def build_search_message(self, message, metadata):
+        for value in six.itervalues(metadata):
+            value_u = force_text(value, errors='replace')
+            if value_u not in message:
+                message = u'{} {}'.format(message, value_u)
+        return message
 
     def to_string(self, metadata):
         warn(DeprecationWarning('This method was replaced by get_title',

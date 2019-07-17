@@ -469,8 +469,9 @@ class EventManager(object):
         for search purposes.  It adds a bunch of data from the metadata and
         the culprit.
         """
+        event_type = self.get_event_type()
         if event_metadata is None:
-            event_metadata = self.get_event_type().get_metadata(self._data)
+            event_metadata = event_type.get_metadata(self._data)
         if culprit is None:
             culprit = self.get_culprit()
 
@@ -482,10 +483,7 @@ class EventManager(object):
                         data['logentry'].get('message') or '')
 
         if event_metadata:
-            for value in six.itervalues(event_metadata):
-                value_u = force_text(value, errors='replace')
-                if value_u not in message:
-                    message = u'{} {}'.format(message, value_u)
+            message = event_type.build_search_message(message, event_metadata)
 
         if culprit and culprit not in message:
             culprit_u = force_text(culprit, errors='replace')

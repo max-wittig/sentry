@@ -23,3 +23,11 @@ class TransactionEvent(BaseEvent):
 
     def get_location(self, metadata):
         return metadata['location']
+
+    def build_search_message(self, message, metadata):
+        # Don't include timestamps in the search message.
+        message_data = {
+            'title': metadata['title'],
+            'location': metadata['location'],
+        }
+        return super(TransactionEvent, self).build_search_message(message, message_data)
