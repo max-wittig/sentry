@@ -74,6 +74,7 @@ class EventOrGroupHeader extends React.Component {
     return (
       <Wrapper
         {...props}
+        data-test-id={data.status === 'resolved' ? 'resolved-issue' : null}
         style={data.status === 'resolved' ? {textDecoration: 'line-through'} : null}
       >
         {!hideLevel && level && (
