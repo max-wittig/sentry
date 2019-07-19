@@ -3,6 +3,7 @@ import styled from 'react-emotion';
 import _ from 'lodash';
 
 import space from 'app/styles/space';
+import Count from 'app/components/count';
 
 import {SpanType, SpanEntry, SentryEvent} from './types';
 import {isValidSpanID, toPercent} from './utils';
@@ -347,8 +348,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
       return null;
     }
 
-    // TODO: replace with the actual vector
-    const chevron = this.state.showSpanTree ? 'v' : '>';
+    const chevron = this.state.showSpanTree ? <ChevronOpen /> : <ChevronClosed />;
 
     return (
       <SpanTreeToggler
@@ -359,7 +359,10 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
           this.toggleSpanTree();
         }}
       >
-        <span>{`${numOfSpanChildren} ${chevron}`}</span>
+        <span style={{marginRight: '2px', textAlign: 'center'}}>
+          <Count value={numOfSpanChildren} />
+        </span>
+        <div style={{marginRight: '2px'}}>{chevron}</div>
       </SpanTreeToggler>
     );
   };
@@ -527,6 +530,7 @@ const SpanTreeToggler = styled('div')`
 
   height: 15px;
   min-width: 25px;
+  line-height: 0 !important;
 
   padding-left: 4px;
   padding-right: 4px;
@@ -536,9 +540,14 @@ const SpanTreeToggler = styled('div')`
   user-select: none;
 
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   align-content: center;
   justify-content: center;
+
+  > span {
+    flex-grow: 999;
+  }
 
   border-radius: 99px;
   border: 1px solid #6e5f7d;
@@ -554,6 +563,10 @@ const SpanTreeToggler = styled('div')`
     background: #6e5f7d;
     border: 1px solid #452650;
     color: #ffffff;
+
+    & svg path {
+      stroke: #fff;
+    }
   }
 `;
 
@@ -587,6 +600,30 @@ const SpanBar = styled('div')`
 
   padding: 4px;
 `;
+
+const ChevronOpen = props => (
+  <svg width={5} height={4} fill="none" {...props}>
+    <path
+      d="M.5 1.25l2 2 2-2"
+      stroke="#6E5F7D"
+      strokeWidth={0.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const ChevronClosed = props => (
+  <svg width={3} height={6} fill="none" {...props}>
+    <path
+      d="M.5 5.25l2-2-2-2"
+      stroke="#6E5F7D"
+      strokeWidth={0.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 type SpanBoundsType = {startTimestamp: number; endTimestamp: number};
 type SpanGeneratedBoundsType = {start: number; end: number};
