@@ -37,6 +37,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     lookup,
     span,
     generateBounds,
+    pickSpanBarColour,
   }: {
     treeDepth: number;
     numOfHiddenSpansAbove: number;
@@ -45,7 +46,10 @@ class SpanTree extends React.Component<SpanTreeProps> {
     span: Readonly<SpanType>;
     lookup: Readonly<LookupType>;
     generateBounds: (bounds: SpanBoundsType) => SpanGeneratedBoundsType;
+    pickSpanBarColour: () => string;
   }): RenderedSpanTree => {
+    const spanBarColour: string = pickSpanBarColour();
+
     const spanChildren: SpanType[] = _.get(lookup, spanID, []);
 
     const start_timestamp: number = span.start_timestamp;
@@ -75,6 +79,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
           traceID,
           lookup,
           generateBounds,
+          pickSpanBarColour,
         });
 
         acc.renderedSpanChildren.push(
@@ -109,6 +114,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
             treeDepth={treeDepth}
             numOfSpanChildren={spanChildren.length}
             renderedSpanChildren={reduced.renderedSpanChildren}
+            spanBarColour={spanBarColour}
           />
         </React.Fragment>
       ),
@@ -138,6 +144,18 @@ class SpanTree extends React.Component<SpanTreeProps> {
       data: {},
     };
 
+    const COLORS = ['#e9e7f7', '#fcefde', '#fffbee', '#f1f5fb'];
+    let current_index = 0;
+
+    const pickSpanBarColour = () => {
+      const next_colour = COLORS[current_index];
+
+      current_index++;
+      current_index = current_index % COLORS.length;
+
+      return next_colour;
+    };
+
     // TODO: remove later
     // const traceEndTimestamp = _.isNumber(parsedTrace.traceEndTimestamp)
     //   ? parsedTrace.traceStartTimestamp == parsedTrace.traceEndTimestamp
@@ -160,6 +178,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
       traceID: trace.trace_id,
       lookup: parsedTrace.lookup,
       generateBounds,
+      pickSpanBarColour,
     }).spanTree;
   };
 
@@ -269,6 +288,7 @@ type SpanPropTypes = {
   treeDepth: number;
   numOfSpanChildren: number;
   renderedSpanChildren: Array<JSX.Element>;
+  spanBarColour: string;
 };
 
 type SpanState = {
@@ -364,8 +384,10 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
             width: '100%',
           }}
         >
-          {op}
-          {description}
+          <span>
+            {op}
+            {description}
+          </span>
         </SpanBarTitle>
       </SpanBarTitleContainer>
     );
@@ -380,7 +402,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
   };
 
   render() {
-    const {span} = this.props;
+    const {span, spanBarColour} = this.props;
 
     const start_timestamp: number = span.start_timestamp;
     const end_timestamp: number = span.timestamp;
@@ -406,6 +428,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
           <SpanBar
             data-span="true"
             style={{
+              backgroundColor: spanBarColour,
               left: toPercent(bounds.start),
               width: toPercent(bounds.end - bounds.start),
             }}
@@ -450,41 +473,6 @@ const SpanRow = styled('div')`
 
   &:hover {
     background-color: rgba(189, 180, 199, 0.1);
-
-    & > [data-span='true'] {
-      transition: background-color 0.15s ease-in-out;
-      background-color: rgba(211, 207, 238, 0.75);
-    }
-  }
-
-  /* Using CSS magic to colour the span bars */
-
-  &:nth-child(4n + 1) {
-    & > [data-span='true'] {
-      transition: background-color 0.15s ease-in-out;
-      background-color: #e9e7f7;
-    }
-  }
-
-  &:nth-child(4n + 2) {
-    & > [data-span='true'] {
-      transition: background-color 0.15s ease-in-out;
-      background-color: #fcefde;
-    }
-  }
-
-  &:nth-child(4n + 3) {
-    & > [data-span='true'] {
-      transition: background-color 0.15s ease-in-out;
-      background-color: #fffbee;
-    }
-  }
-
-  &:nth-child(4n) {
-    & > [data-span='true'] {
-      transition: background-color 0.15s ease-in-out;
-      background-color: #f1f5fb;
-    }
   }
 `;
 
@@ -534,6 +522,8 @@ const SpanBarTitle = styled('div')`
 
 const SpanTreeToggler = styled('div')`
   position: relative;
+
+  white-space: nowrap;
 
   height: 15px;
   min-width: 25px;
