@@ -32,6 +32,7 @@ type Foo = {
 
 class SpanTree extends React.Component<SpanTreeProps> {
   renderSpan = ({
+    treeDepth,
     numOfHiddenSpansAbove,
     spanID,
     traceID,
@@ -39,6 +40,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     span,
     generateBounds,
   }: {
+    treeDepth: number;
     numOfHiddenSpansAbove: number;
     spanID: string;
     traceID: string;
@@ -68,6 +70,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
         const key = `${traceID}${span.span_id}`;
 
         const foo = this.renderSpan({
+          treeDepth: treeDepth + 1,
           numOfHiddenSpansAbove: acc.numOfHiddenSpansAbove,
           span,
           spanID: span.span_id,
@@ -102,7 +105,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
       spanTree: (
         <React.Fragment>
           {hiddenSpansMessage}
-          <Span span={span} generateBounds={generateBounds} />
+          <Span span={span} generateBounds={generateBounds} treeDepth={treeDepth} />
           {reduced.renderedSpanChildren}
         </React.Fragment>
       ),
@@ -146,6 +149,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     });
 
     return this.renderSpan({
+      treeDepth: 0,
       numOfHiddenSpansAbove: 0,
       span: rootSpan,
       spanID: trace.span_id,
@@ -258,6 +262,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
 type SpanPropTypes = {
   span: Readonly<SpanType>;
   generateBounds: (bounds: SpanBoundsType) => SpanGeneratedBoundsType;
+  treeDepth: number;
 };
 
 type SpanState = {
@@ -401,18 +406,18 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
   };
 
   renderTitle = () => {
-    const {span} = this.props;
+    const {span, treeDepth} = this.props;
 
     const op = span.op ? <strong>{`${span.op} \u2014 `}</strong> : '';
     const description = _.get(span, 'description', span.span_id);
 
-    const bounds = this.getBounds();
+    // const bounds = this.getBounds();
 
     return (
       <SpanBarTitle
         style={{
-          left: toPercent(bounds.start),
-          width: toPercent(bounds.end - bounds.start),
+          left: `${treeDepth * 50}px`,
+          width: '100%',
         }}
       >
         {op}
