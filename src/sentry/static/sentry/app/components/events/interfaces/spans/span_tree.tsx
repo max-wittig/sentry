@@ -105,7 +105,12 @@ class SpanTree extends React.Component<SpanTreeProps> {
       spanTree: (
         <React.Fragment>
           {hiddenSpansMessage}
-          <Span span={span} generateBounds={generateBounds} treeDepth={treeDepth} />
+          <Span
+            span={span}
+            generateBounds={generateBounds}
+            treeDepth={treeDepth}
+            numOfSpanChildren={spanChildren.length}
+          />
           {reduced.renderedSpanChildren}
         </React.Fragment>
       ),
@@ -263,6 +268,7 @@ type SpanPropTypes = {
   span: Readonly<SpanType>;
   generateBounds: (bounds: SpanBoundsType) => SpanGeneratedBoundsType;
   treeDepth: number;
+  numOfSpanChildren: number;
 };
 
 type SpanState = {
@@ -405,6 +411,16 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     });
   };
 
+  renderSpanTreeToggler = () => {
+    const {numOfSpanChildren} = this.props;
+
+    if (numOfSpanChildren <= 0) {
+      return null;
+    }
+
+    return <SpanTreeToggler>{numOfSpanChildren}</SpanTreeToggler>;
+  };
+
   renderTitle = () => {
     const {span, treeDepth} = this.props;
 
@@ -414,15 +430,18 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     // const bounds = this.getBounds();
 
     return (
-      <SpanBarTitle
-        style={{
-          left: `${treeDepth * 50}px`,
-          width: '100%',
-        }}
-      >
-        {op}
-        {description}
-      </SpanBarTitle>
+      <SpanBarTitleContainer>
+        {this.renderSpanTreeToggler()}
+        <SpanBarTitle
+          style={{
+            left: `${treeDepth * 50}px`,
+            width: '100%',
+          }}
+        >
+          {op}
+          {description}
+        </SpanBarTitle>
+      </SpanBarTitleContainer>
     );
   };
 
@@ -516,6 +535,17 @@ const SpanRowMessage = styled(SpanRow)`
   z-index: 99999;
 `;
 
+const SpanBarTitleContainer = styled('div')`
+  display: flex;
+  align-items: center;
+
+  height: ${SPAN_ROW_HEIGHT}px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+`;
+
 const SpanBarTitle = styled('div')`
   position: absolute;
   top: 0;
@@ -530,6 +560,23 @@ const SpanBarTitle = styled('div')`
   margin-left: 10px;
 
   white-space: nowrap;
+`;
+
+const SpanTreeToggler = styled('div')`
+  position: absolute;
+  left: 0;
+
+  height: 15px;
+  min-width: 25px;
+
+  border-radius: 99px;
+  border: 1px solid #6e5f7d;
+
+  background: #fbfaf9;
+
+  font-size: 9px;
+  line-height: 15px;
+  color: #6e5f7d;
 `;
 
 const Duration = styled('div')`
