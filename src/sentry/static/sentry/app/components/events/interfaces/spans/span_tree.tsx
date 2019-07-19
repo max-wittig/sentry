@@ -138,15 +138,16 @@ class SpanTree extends React.Component<SpanTreeProps> {
       data: {},
     };
 
-    const traceEndTimestamp = _.isNumber(parsedTrace.traceEndTimestamp)
-      ? parsedTrace.traceStartTimestamp == parsedTrace.traceEndTimestamp
-        ? parsedTrace.traceStartTimestamp + 0.05
-        : parsedTrace.traceEndTimestamp
-      : parsedTrace.traceStartTimestamp + 0.05;
+    // TODO: remove later
+    // const traceEndTimestamp = _.isNumber(parsedTrace.traceEndTimestamp)
+    //   ? parsedTrace.traceStartTimestamp == parsedTrace.traceEndTimestamp
+    //     ? parsedTrace.traceStartTimestamp + 0.05
+    //     : parsedTrace.traceEndTimestamp
+    //   : parsedTrace.traceStartTimestamp + 0.05;
 
     const generateBounds = boundsGenerator({
       traceStartTimestamp: parsedTrace.traceStartTimestamp,
-      traceEndTimestamp,
+      traceEndTimestamp: parsedTrace.traceEndTimestamp,
       viewStart: dragProps.viewWindowStart,
       viewEnd: dragProps.viewWindowEnd,
     });
