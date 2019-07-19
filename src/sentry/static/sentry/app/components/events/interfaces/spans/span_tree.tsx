@@ -19,15 +19,15 @@ type TraceType = {
 
 type LookupType = {[span_id: string]: SpanType[]};
 
+type RenderedSpanTree = {
+  spanTree: JSX.Element;
+  numOfHiddenSpansAbove: number;
+};
+
 type SpanTreeProps = {
   traceViewRef: React.RefObject<HTMLDivElement>;
   event: SentryEvent;
   dragProps: DragManagerChildrenProps;
-};
-
-type Foo = {
-  spanTree: JSX.Element;
-  numOfHiddenSpansAbove: number;
 };
 
 class SpanTree extends React.Component<SpanTreeProps> {
@@ -47,7 +47,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     span: Readonly<SpanType>;
     lookup: Readonly<LookupType>;
     generateBounds: (bounds: SpanBoundsType) => SpanGeneratedBoundsType;
-  }): Foo => {
+  }): RenderedSpanTree => {
     const spanChildren: SpanType[] = _.get(lookup, spanID, []);
 
     const start_timestamp: number = span.start_timestamp;
