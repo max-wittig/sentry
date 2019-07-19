@@ -320,7 +320,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     });
   };
 
-  renderSpanTreeToggler = () => {
+  renderSpanTreeToggler = ({left}: {left: number}) => {
     const {numOfSpanChildren} = this.props;
 
     if (numOfSpanChildren <= 0) {
@@ -332,6 +332,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
 
     return (
       <SpanTreeToggler
+        style={{left: `${left}px`}}
         onClick={event => {
           event.stopPropagation();
 
@@ -351,12 +352,15 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
 
     // const bounds = this.getBounds();
 
+    const MARGIN_LEFT = 8;
+    const left = treeDepth * (8 * 5) + MARGIN_LEFT;
+
     return (
       <SpanBarTitleContainer>
-        {this.renderSpanTreeToggler()}
+        {this.renderSpanTreeToggler({left})}
         <SpanBarTitle
           style={{
-            left: `${treeDepth * 50}px`,
+            left: `${left}px`,
             width: '100%',
           }}
         >
@@ -513,7 +517,7 @@ const SpanBarTitleContainer = styled('div')`
 `;
 
 const SpanBarTitle = styled('div')`
-  position: absolute;
+  position: relative;
   top: 0;
 
   height: ${SPAN_ROW_HEIGHT}px;
@@ -523,17 +527,19 @@ const SpanBarTitle = styled('div')`
   font-size: 12px;
 
   user-select: none;
-  margin-left: 10px;
+  margin-left: 8px;
 
   white-space: nowrap;
 `;
 
 const SpanTreeToggler = styled('div')`
-  position: absolute;
-  left: 0;
+  position: relative;
 
   height: 15px;
   min-width: 25px;
+
+  padding-left: 4px;
+  padding-right: 4px;
 
   z-index: 999999;
 
