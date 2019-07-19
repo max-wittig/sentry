@@ -418,7 +418,11 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
       return null;
     }
 
-    return <SpanTreeToggler>{numOfSpanChildren}</SpanTreeToggler>;
+    return (
+      <SpanTreeToggler>
+        <span>{numOfSpanChildren}</span>
+      </SpanTreeToggler>
+    );
   };
 
   renderTitle = () => {
@@ -569,14 +573,28 @@ const SpanTreeToggler = styled('div')`
   height: 15px;
   min-width: 25px;
 
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+
   border-radius: 99px;
   border: 1px solid #6e5f7d;
 
   background: #fbfaf9;
+  transition: all 0.15s ease-in-out;
 
   font-size: 9px;
   line-height: 15px;
   color: #6e5f7d;
+
+  &:hover {
+    background: #6e5f7d;
+    border: 1px solid #452650;
+    color: #ffffff;
+  }
 `;
 
 const Duration = styled('div')`
