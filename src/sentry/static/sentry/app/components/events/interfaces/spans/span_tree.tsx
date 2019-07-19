@@ -67,7 +67,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
       (acc: AccType, span) => {
         const key = `${traceID}${span.span_id}`;
 
-        const foo = this.renderSpan({
+        const results = this.renderSpan({
           treeDepth: treeDepth + 1,
           numOfHiddenSpansAbove: acc.numOfHiddenSpansAbove,
           span,
@@ -78,10 +78,10 @@ class SpanTree extends React.Component<SpanTreeProps> {
         });
 
         acc.renderedSpanChildren.push(
-          <React.Fragment key={key}>{foo.spanTree}</React.Fragment>
+          <React.Fragment key={key}>{results.spanTree}</React.Fragment>
         );
 
-        acc.numOfHiddenSpansAbove = foo.numOfHiddenSpansAbove;
+        acc.numOfHiddenSpansAbove = results.numOfHiddenSpansAbove;
 
         return acc;
       },
