@@ -273,11 +273,21 @@ type SpanPropTypes = {
 
 type SpanState = {
   displayDetail: boolean;
+  showSpanTree: boolean;
 };
 
 class Span extends React.Component<SpanPropTypes, SpanState> {
   state: SpanState = {
     displayDetail: false,
+    showSpanTree: true,
+  };
+
+  toggleSpanTree = () => {
+    this.setState(state => {
+      return {
+        showSpanTree: !state.showSpanTree,
+      };
+    });
   };
 
   toggleDisplayDetail = () => {
@@ -418,9 +428,18 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
       return null;
     }
 
+    // TODO: replace with the actual vector
+    const chevron = this.state.showSpanTree ? 'v' : '>';
+
     return (
-      <SpanTreeToggler>
-        <span>{numOfSpanChildren}</span>
+      <SpanTreeToggler
+        onClick={event => {
+          event.stopPropagation();
+
+          this.toggleSpanTree();
+        }}
+      >
+        <span>{`${numOfSpanChildren} ${chevron}`}</span>
       </SpanTreeToggler>
     );
   };
@@ -574,6 +593,8 @@ const SpanTreeToggler = styled('div')`
   min-width: 25px;
 
   z-index: 999999;
+
+  user-select: none;
 
   display: flex;
   align-items: center;
