@@ -59,7 +59,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     const isCurrentSpanHidden = bounds.end <= 0;
 
     type AccType = {
-      renderedSpanChildren: JSX.Element[];
+      renderedSpanChildren: Array<JSX.Element>;
       numOfHiddenSpansAbove: number;
     };
 
@@ -108,8 +108,8 @@ class SpanTree extends React.Component<SpanTreeProps> {
             generateBounds={generateBounds}
             treeDepth={treeDepth}
             numOfSpanChildren={spanChildren.length}
+            renderedSpanChildren={reduced.renderedSpanChildren}
           />
-          {reduced.renderedSpanChildren}
         </React.Fragment>
       ),
     };
@@ -268,6 +268,7 @@ type SpanPropTypes = {
   generateBounds: (bounds: SpanBoundsType) => SpanGeneratedBoundsType;
   treeDepth: number;
   numOfSpanChildren: number;
+  renderedSpanChildren: Array<JSX.Element>;
 };
 
 type SpanState = {
@@ -366,6 +367,14 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     );
   };
 
+  renderSpanChildren = () => {
+    if (!this.state.showSpanTree) {
+      return null;
+    }
+
+    return this.props.renderedSpanChildren;
+  };
+
   render() {
     const {span} = this.props;
 
@@ -380,26 +389,29 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     const isVisible = bounds.end > 0;
 
     return (
-      <SpanRow
-        style={{
-          display: isVisible ? 'block' : 'none',
-          boxShadow: this.state.displayDetail ? '0 -1px 0 #d1cad8' : void 0,
-        }}
-        onClick={() => {
-          this.toggleDisplayDetail();
-        }}
-      >
-        <SpanBar
-          data-span="true"
+      <React.Fragment>
+        <SpanRow
           style={{
-            left: toPercent(bounds.start),
-            width: toPercent(bounds.end - bounds.start),
+            display: isVisible ? 'block' : 'none',
+            boxShadow: this.state.displayDetail ? '0 -1px 0 #d1cad8' : void 0,
           }}
-        />
-        {this.renderTitle()}
-        <Duration>{durationString}</Duration>
-        {this.renderDetail({isVisible})}
-      </SpanRow>
+          onClick={() => {
+            this.toggleDisplayDetail();
+          }}
+        >
+          <SpanBar
+            data-span="true"
+            style={{
+              left: toPercent(bounds.start),
+              width: toPercent(bounds.end - bounds.start),
+            }}
+          />
+          {this.renderTitle()}
+          <Duration>{durationString}</Duration>
+          {this.renderDetail({isVisible})}
+        </SpanRow>
+        {this.renderSpanChildren()}
+      </React.Fragment>
     );
   }
 }
