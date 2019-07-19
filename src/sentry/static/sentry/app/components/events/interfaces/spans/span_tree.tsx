@@ -431,9 +431,12 @@ const SpanRow = styled('div')`
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
 
+  /*
+  TODO: remove this zebra row stuffs
   &:nth-child(even) {
     background-color: rgba(231, 225, 236, 0.2);
   }
+  */
 
   &:last-child {
     & > [data-component='span-detail'] {
@@ -447,6 +450,36 @@ const SpanRow = styled('div')`
     & > [data-span='true'] {
       transition: background-color 0.15s ease-in-out;
       background-color: rgba(211, 207, 238, 0.75);
+    }
+  }
+
+  /* Using CSS magic to colour the span bars */
+
+  &:nth-child(4n + 1) {
+    & > [data-span='true'] {
+      transition: background-color 0.15s ease-in-out;
+      background-color: #e9e7f7;
+    }
+  }
+
+  &:nth-child(4n + 2) {
+    & > [data-span='true'] {
+      transition: background-color 0.15s ease-in-out;
+      background-color: #fcefde;
+    }
+  }
+
+  &:nth-child(4n + 3) {
+    & > [data-span='true'] {
+      transition: background-color 0.15s ease-in-out;
+      background-color: #fffbee;
+    }
+  }
+
+  &:nth-child(4n) {
+    & > [data-span='true'] {
+      transition: background-color 0.15s ease-in-out;
+      background-color: #f1f5fb;
     }
   }
 `;
@@ -557,8 +590,6 @@ const SpanBar = styled('div')`
   user-select: none;
 
   padding: 4px;
-
-  background-color: rgba(211, 207, 238, 1);
 `;
 
 type SpanBoundsType = {startTimestamp: number; endTimestamp: number};
