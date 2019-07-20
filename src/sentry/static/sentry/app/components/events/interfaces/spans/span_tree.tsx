@@ -510,7 +510,6 @@ const SpanBarTitle = styled('div')`
   font-size: 12px;
 
   user-select: none;
-  margin-left: 8px;
 
   white-space: nowrap;
 `;
@@ -526,6 +525,8 @@ const SpanTreeToggler = styled('div')`
 
   padding-left: 4px;
   padding-right: 4px;
+
+  margin-right: 8px;
 
   z-index: 999999;
 
