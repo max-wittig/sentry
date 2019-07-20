@@ -73,15 +73,15 @@ class SpanTree extends React.Component<SpanTreeProps> {
     };
 
     const reduced: AccType = spanChildren.reduce(
-      (acc: AccType, span) => {
-        const key = `${traceID}${span.span_id}`;
+      (acc: AccType, spanChild) => {
+        const key = `${traceID}${spanChild.span_id}`;
 
         const results = this.renderSpan({
           treeDepth: treeDepth + 1,
           numberOfChildrenOfParent: [...numberOfChildrenOfParent, numOfSpanChildren],
           numOfHiddenSpansAbove: acc.numOfHiddenSpansAbove,
-          span,
-          spanID: span.span_id,
+          span: spanChild,
+          spanID: spanChild.span_id,
           traceID,
           lookup,
           generateBounds,
@@ -560,7 +560,6 @@ const SpanTreeToggler = styled('div')`
 
   height: 15px;
   min-width: 25px;
-  line-height: 0 !important;
 
   padding-left: 4px;
   padding-right: 4px;
@@ -588,7 +587,7 @@ const SpanTreeToggler = styled('div')`
   transition: all 0.15s ease-in-out;
 
   font-size: 9px;
-  line-height: 15px;
+  line-height: 0;
   color: #6e5f7d;
 
   &:hover {

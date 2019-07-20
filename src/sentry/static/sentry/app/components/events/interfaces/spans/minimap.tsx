@@ -61,7 +61,7 @@ class Minimap extends React.Component<MinimapProps, MinimapState> {
       canvas.height = height * devicePixelRatio;
 
       // scale the canvas down by the dpr factor thru CSS
-      canvas.style.width = `100%`;
+      canvas.style.width = '100%';
       canvas.style.height = `${height}px`;
     };
 
@@ -117,7 +117,11 @@ class Minimap extends React.Component<MinimapProps, MinimapState> {
     const rect = rectOfContent(minimapCanvas);
 
     // clamp mouseLeft to be within [0, 100]
-    let mouseLeft = clamp(((this.state.mousePageX - rect.x) / rect.width) * 100, 0, 100);
+    const mouseLeft = clamp(
+      ((this.state.mousePageX - rect.x) / rect.width) * 100,
+      0,
+      100
+    );
 
     return (
       <React.Fragment>

@@ -27,6 +27,7 @@ class TransactionView extends React.Component<
 
   componentDidMount() {
     if (this.traceViewRef.current) {
+      // eslint-disable-next-line react/no-did-mount-set-state
       this.setState({
         renderMinimap: true,
       });
