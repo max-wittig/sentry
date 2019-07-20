@@ -442,11 +442,12 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
 
     const bounds = this.getBounds();
 
-    const isVisible = bounds.end > 0;
+    const isVisible = bounds.end > 0 && bounds.start < 1;
 
     return (
       <React.Fragment>
         <SpanRow
+          data-span-hidden={isVisible ? 'false' : 'true'}
           style={{
             display: isVisible ? 'block' : 'none',
             boxShadow: this.state.displayDetail ? '0 -1px 0 #d1cad8' : void 0,
