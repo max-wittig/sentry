@@ -31,6 +31,7 @@ type SpanTreeProps = {
 
 class SpanTree extends React.Component<SpanTreeProps> {
   renderSpan = ({
+    ancestryID,
     treeDepth,
     numOfHiddenSpansAbove,
     spanID,
@@ -40,6 +41,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     generateBounds,
     pickSpanBarColour,
   }: {
+    ancestryID: string;
     treeDepth: number;
     numOfHiddenSpansAbove: number;
     spanID: string;
@@ -50,6 +52,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     pickSpanBarColour: () => string;
   }): RenderedSpanTree => {
     const spanBarColour: string = pickSpanBarColour();
+    const currentAncestryID = ancestryID ? `${ancestryID}.${spanID}` : spanID;
 
     const spanChildren: SpanType[] = _.get(lookup, spanID, []);
 
@@ -73,6 +76,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
         const key = `${traceID}${span.span_id}`;
 
         const results = this.renderSpan({
+          ancestryID: currentAncestryID,
           treeDepth: treeDepth + 1,
           numOfHiddenSpansAbove: acc.numOfHiddenSpansAbove,
           span,
@@ -97,12 +101,13 @@ class SpanTree extends React.Component<SpanTreeProps> {
       }
     );
 
-    const hiddenSpansMessage =
-      !isCurrentSpanHidden && numOfHiddenSpansAbove > 0 ? (
-        <SpanRowMessage>
-          <span>Number of hidden spans: {numOfHiddenSpansAbove}</span>
-        </SpanRowMessage>
-      ) : null;
+    const showHiddenSpansMessage = !isCurrentSpanHidden && numOfHiddenSpansAbove > 0;
+
+    const hiddenSpansMessage = showHiddenSpansMessage ? (
+      <SpanRowMessage>
+        <span>Number of hidden spans: {numOfHiddenSpansAbove}</span>
+      </SpanRowMessage>
+    ) : null;
 
     return {
       numOfHiddenSpansAbove: reduced.numOfHiddenSpansAbove,
@@ -110,6 +115,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
         <React.Fragment>
           {hiddenSpansMessage}
           <Span
+            currentAncestryID={currentAncestryID}
             span={span}
             generateBounds={generateBounds}
             treeDepth={treeDepth}
@@ -172,6 +178,7 @@ class SpanTree extends React.Component<SpanTreeProps> {
     });
 
     return this.renderSpan({
+      ancestryID: '',
       treeDepth: 0,
       numOfHiddenSpansAbove: 0,
       span: rootSpan,
@@ -290,6 +297,7 @@ type SpanPropTypes = {
   numOfSpanChildren: number;
   renderedSpanChildren: Array<JSX.Element>;
   spanBarColour: string;
+  currentAncestryID: string;
 };
 
 type SpanState = {
@@ -304,9 +312,42 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
   };
 
   toggleSpanTree = () => {
+    const {currentAncestryID} = this.props;
+
     this.setState(state => {
+      const nextShowSpanTree = !state.showSpanTree;
+
+      // we hide/show span descendents thru vanilla js DOM operations.
+      // we do this so as to not deliberately un-mount the span children
+
+      // select all rows whose ancestry begins with currentAncestryID
+      const selectAncestors = `div[data-span-ancestry^="${currentAncestryID}"]`;
+
+      // ignore the parent row (i.e. this span component)
+      const doNotSelectParent = `:not([data-span-ancestry="${currentAncestryID}-parent"])`;
+
+      const selectHidden =
+        // display the span tree, then
+        nextShowSpanTree
+          ? // choose all span rows that were hidden by this span row
+            `[data-span-hidden-by="${currentAncestryID}"]`
+          : // otherwise, hide descendents that weren't already hidden
+            `:not([data-span-hidden-by])`;
+
+      const query = `${selectAncestors}${doNotSelectParent}${selectHidden}`;
+
+      document.querySelectorAll<HTMLDivElement>(query).forEach(spanDOM => {
+        spanDOM.style.display = nextShowSpanTree ? 'block' : 'none';
+
+        if (nextShowSpanTree) {
+          spanDOM.removeAttribute('data-span-hidden-by');
+        } else {
+          spanDOM.setAttribute('data-span-hidden-by', currentAncestryID);
+        }
+      });
+
       return {
-        showSpanTree: !state.showSpanTree,
+        showSpanTree: nextShowSpanTree,
       };
     });
   };
@@ -373,8 +414,6 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     const op = span.op ? <strong>{`${span.op} \u2014 `}</strong> : '';
     const description = _.get(span, 'description', span.span_id);
 
-    // const bounds = this.getBounds();
-
     const MARGIN_LEFT = 8;
     const left = treeDepth * (8 * 5) + MARGIN_LEFT;
 
@@ -397,15 +436,16 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
   };
 
   renderSpanChildren = () => {
-    if (!this.state.showSpanTree) {
-      return null;
-    }
+    // TODO: remove this
+    // if (!this.state.showSpanTree) {
+    //   return null;
+    // }
 
     return this.props.renderedSpanChildren;
   };
 
   render() {
-    const {span, spanBarColour} = this.props;
+    const {span, spanBarColour, currentAncestryID} = this.props;
 
     const start_timestamp: number = span.start_timestamp;
     const end_timestamp: number = span.timestamp;
@@ -420,6 +460,7 @@ class Span extends React.Component<SpanPropTypes, SpanState> {
     return (
       <React.Fragment>
         <SpanRow
+          data-span-ancestry={`${currentAncestryID}-parent`}
           style={{
             display: isVisible ? 'block' : 'none',
             boxShadow: this.state.displayDetail ? '0 -1px 0 #d1cad8' : void 0,
@@ -460,13 +501,6 @@ const SpanRow = styled('div')`
 
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
-
-  /*
-  TODO: remove this zebra row stuffs
-  &:nth-child(even) {
-    background-color: rgba(231, 225, 236, 0.2);
-  }
-  */
 
   &:last-child {
     & > [data-component='span-detail'] {
