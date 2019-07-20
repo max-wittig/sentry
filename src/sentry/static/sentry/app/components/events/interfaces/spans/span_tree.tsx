@@ -6,7 +6,13 @@ import space from 'app/styles/space';
 import Count from 'app/components/count';
 
 import {SpanType, SpanEntry, SentryEvent} from './types';
-import {isValidSpanID, toPercent} from './utils';
+import {
+  isValidSpanID,
+  toPercent,
+  boundsGenerator,
+  SpanBoundsType,
+  SpanGeneratedBoundsType,
+} from './utils';
 import {DragManagerChildrenProps} from './drag_manager';
 import SpanDetail from './span_detail';
 
@@ -655,47 +661,5 @@ const ChevronClosed = props => (
     />
   </svg>
 );
-
-type SpanBoundsType = {startTimestamp: number; endTimestamp: number};
-type SpanGeneratedBoundsType = {start: number; end: number};
-
-const boundsGenerator = (bounds: {
-  traceStartTimestamp: number;
-  traceEndTimestamp: number;
-  viewStart: number; // in [0, 1]
-  viewEnd: number; // in [0, 1]
-}) => {
-  const {traceEndTimestamp, traceStartTimestamp, viewStart, viewEnd} = bounds;
-
-  // viewStart and viewEnd are percentage values (%) of the view window relative to the left
-  // side of the trace view minimap
-
-  // invariant: viewStart <= viewEnd
-
-  // duration of the entire trace in seconds
-  const duration = traceEndTimestamp - traceStartTimestamp;
-
-  const viewStartTimestamp = traceStartTimestamp + viewStart * duration;
-  const viewEndTimestamp = traceEndTimestamp - (1 - viewEnd) * duration;
-  const viewDuration = viewEndTimestamp - viewStartTimestamp;
-
-  return (spanBounds: SpanBoundsType): SpanGeneratedBoundsType => {
-    const {startTimestamp, endTimestamp} = spanBounds;
-
-    const start = (startTimestamp - viewStartTimestamp) / viewDuration;
-
-    if (!_.isNumber(endTimestamp)) {
-      return {
-        start,
-        end: 1,
-      };
-    }
-
-    return {
-      start,
-      end: (endTimestamp - viewStartTimestamp) / viewDuration,
-    };
-  };
-};
 
 export default SpanTree;
